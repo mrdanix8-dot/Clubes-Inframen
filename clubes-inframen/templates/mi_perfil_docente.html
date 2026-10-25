@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil · Docente INFRAMEN{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-header fade-up">
+        {% if usuario and usuario.foto %}
+        <img src="{{ url_for('uploaded_file', filename=usuario.foto) }}" alt="Foto" class="profile-avatar" style="object-fit:cover;padding:0;border-radius:50%;">
+        {% else %}
+        <div class="profile-avatar">{{ usuario.nombre[0] if usuario else '?' }}</div>
+        {% endif %}
+        <div>
+            <h1 style="font-size:1.6rem;margin-bottom:0.2rem;">{{ usuario.nombre }}</h1>
+            <p style="color:var(--text-secondary);">
+                NIE: {{ usuario.nie }} ·
+                <span class="badge badge-info">{{ usuario.cargo or 'Docente' }}</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="card" style="padding:1.5rem;margin-bottom:2rem;">
+        <h2 class="section-title">✏️ Editar foto de perfil</h2>
+        <form method="POST" action="{{ url_for('editar_perfil') }}" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Nueva foto</label>
+                <input type="file" name="foto" class="form-control" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar foto</button>
+        </form>
+    </div>
+
+    <h2 class="section-title">🏅 Clubes que administro</h2>
+    {% if mis_clubes %}
+    <div class="clubs-grid" style="margin-bottom:2rem;">
+        {% for c in mis_clubes %}
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">{{ c.nombre }}</h3>
+                <div class="card-meta">
+                    <span>{{ c.categoria }}</span>
+                    <span>{{ c.inscritos }}/{{ c.capacidad }} inscritos</span>
+                    <span>{{ c.turno }}</span>
+                </div>
+                <p style="font-size:0.9rem;color:var(--text-secondary);">🕒 {{ c.horario or 'Sin horario' }}</p>
+                <p style="font-size:0.85rem;">📍 {{ c.lugar or '—' }}</p>
+                <a href="{{ url_for('gestion') }}" class="btn btn-sm btn-outline" style="margin-top:0.6rem;">Gestionar</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:var(--text-secondary);margin-bottom:1.5rem;">
+        Aún no tienes clubes asignados.
+        <a href="{{ url_for('gestion') }}" style="color:var(--accent);">Crear o asignar clubes en Gestión Docente →</a>
+    </p>
+    {% endif %}
+
+    {% if sin_asignar %}
+    <h2 class="section-title">📋 Clubes sin docente asignado</h2>
+    <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem;">Puedes tomarlos desde Gestión Docente al crear anuncios o editar horarios.</p>
+    <ul style="margin-bottom:2rem;padding-left:1.2rem;color:var(--text-secondary);">
+        {% for c in sin_asignar %}
+        <li>{{ c.nombre }} ({{ c.categoria }})</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h2 class="section-title">📄 Permisos PDF que he publicado</h2>
+    {% if permisos_pub %}
+    <div class="table-wrap" style="margin-bottom:2rem;">
+        <table>
+            <thead>
+                <tr><th>Motivo</th><th>Club</th><th>Fecha</th><th>PDF</th></tr>
+            </thead>
+            <tbody>
+                {% for p in permisos_pub %}
+                <tr>
+                    <td>{{ p.motivo or '—' }}</td>
+                    <td>{{ p.club_nombre or '—' }}</td>
+                    <td>{{ p.fecha[:16] if p.fecha else '' }}</td>
+                    <td>
+                        {% if p.archivo_pdf %}
+                        <a href="{{ url_for('uploaded_file', filename=p.archivo_pdf) }}" target="_blank" class="btn btn-sm btn-outline">Ver</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color:var(--text-secondary);margin-bottom:2rem;">Aún no has subido permisos PDF. Hazlo en <a href="{{ url_for('gestion') }}" style="color:var(--accent);">Gestión Docente</a>.</p>
+    {% endif %}
+
+    <h2 class="section-title">🔔 Notificaciones</h2>
+    {% if notifs %}
+        {% for n in notifs %}
+        <div class="anuncio">
+            <h4>{{ n.titulo }}</h4>
+            <div class="meta">{{ n.fecha[:16] if n.fecha else '' }}</div>
+            <p>{{ n.mensaje }}</p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="color:var(--text-secondary);">Sin notificaciones.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión · Clubes INFRAMEN</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/escorpion.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <button class="btn-icon" id="theme-toggle" title="Cambiar tema"
+            style="position:fixed;top:16px;right:16px;z-index:100;width:44px;height:44px;font-size:1.2rem;">🌙</button>
+    <div class="login-page">
+        <div class="login-card fade-up">
+            <div style="text-align:center;margin-bottom:1rem;">
+                <img src="{{ url_for('static', filename='img/escorpion.png') }}" alt="INFRAMEN"
+                     style="width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(225,29,72,0.4));">
+            </div>
+            <div style="text-align:center;margin-bottom:0.5rem;font-size:0.8rem;letter-spacing:1px;color:var(--text-secondary);">
+                PORTAL DE CLUBES · INFRAMEN
+            </div>
+            <h1 style="text-align:center;">Bienvenido</h1>
+            <p class="subtitle" style="text-align:center;">
+                Ingresa para consultar y gestionar las actividades de tu club.
+            </p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" style="margin-bottom:1rem;">{{ message }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            <!-- LOGIN -->
+            <form id="form-login" method="POST" action="{{ url_for('login') }}">
+                <div class="role-tabs">
+                    <button type="button" class="active" data-rol="estudiante">Estudiante</button>
+                    <button type="button" data-rol="docente">Administrador</button>
+                </div>
+                <input type="hidden" name="rol" id="rol-input" value="estudiante">
+
+                <div class="form-group">
+                    <label for="nie" id="label-nie-login">NIE</label>
+                    <input type="text" id="nie" name="nie" class="form-control" placeholder="Ej: 6863835" required maxlength="20" pattern="[A-Za-z0-9\-]+" title="Solo letras, números o guiones (4-20)">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top:0.5rem;">
+                    Iniciar sesión
+                </button>
+            </form>
+
+            <!-- REGISTRO -->
+            <form id="form-registro" method="POST" action="{{ url_for('registro') }}" enctype="multipart/form-data" style="display:none;">
+                <div class="role-tabs">
+                    <button type="button" class="active" data-rol="estudiante">Estudiante</button>
+                    <button type="button" data-rol="docente">Docente / Admin</button>
+                </div>
+                <input type="hidden" name="rol" id="rol-input-reg" value="estudiante">
+
+                <div class="form-group">
+                    <label id="label-nie-reg">NIE (Número de Identificación Estudiantil) *</label>
+                    <input type="text" name="nie" id="reg-nie" class="form-control" required maxlength="20" pattern="[A-Za-z0-9\-]+" title="4 a 20 caracteres">
+                </div>
+
+                <div class="form-group">
+                    <label>Nombre completo *</label>
+                    <input type="text" name="nombre" class="form-control" required maxlength="60" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s\.\-]{3,60}" title="Solo letras, 3 a 60 caracteres">
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña *</label>
+                    <input type="password" name="password" class="form-control" required minlength="4">
+                </div>
+
+                <div id="campos-estudiante">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Sección / Año</label>
+                            <select name="seccion" class="form-control">
+                                <option value="">Seleccionar</option>
+                                <option value="1ero">1er Año</option>
+                                <option value="2do">2do Año</option>
+                                <option value="3ero">3er Año</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Bachillerato</label>
+                            <select name="bachillerato" class="form-control">
+                                <option value="">Seleccionar</option>
+                                <option value="General">General</option>
+                                <option value="Técnico Software">Técnico Software</option>
+                                <option value="Técnico Contable">Técnico Contable</option>
+                                <option value="Técnico en Electrónica">Técnico en Electrónica</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Edad</label>
+                            <input type="number" name="edad" class="form-control" min="14" max="70" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <div class="form-group">
+                            <label>Promedio (boleta)</label>
+                            <input type="number" name="promedio" class="form-control" step="0.1" min="0" max="10" placeholder="Ej: 8.5" inputmode="decimal">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="extra-docente" style="display:none;">
+                    <div class="form-group">
+                        <label>Cargo</label>
+                        <select name="cargo" class="form-control">
+                            <option value="docente">Docente</option>
+                            <option value="coordinador">Coordinador</option>
+                            <option value="subdirector">Subdirector</option>
+                            <option value="director">Director</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Foto de perfil (opcional)</label>
+                    <input type="file" name="foto" class="form-control" accept="image/*">
+                    <small style="color:var(--text-secondary);font-size:0.75rem;">JPG, PNG o WEBP</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top:0.5rem;">
+                    Crear cuenta
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <span id="texto-login">¿Es tu primera vez? <a href="#" id="show-registro">Crear cuenta</a></span>
+                <span id="texto-reg" style="display:none;">¿Ya tienes cuenta? <a href="#" id="show-login">Iniciar sesión</a></span>
+            </div>
+
+            <div style="margin-top:1.5rem;text-align:center;font-size:0.75rem;color:var(--text-muted);">
+                Instituto Nacional Gral. Francisco Menéndez · 1885
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        function setRolLabels(rol, isLogin) {
+            if (isLogin) {
+                const lab = document.getElementById("label-nie-login");
+                if (lab) lab.textContent = rol === "docente" ? "ID del maestro" : "NIE";
+                const input = document.getElementById("nie");
+                if (input) input.placeholder = rol === "docente" ? "Ej: DOC-2018-042" : "Ej: 6863835";
+            } else {
+                const lab = document.getElementById("label-nie-reg");
+                if (lab) lab.textContent = rol === "docente"
+                    ? "ID del maestro *"
+                    : "NIE (Número de Identificación Estudiantil) *";
+            }
+        }
+
+        // Login tabs
+        document.querySelectorAll("#form-login .role-tabs button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#form-login .role-tabs button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                document.getElementById("rol-input").value = btn.dataset.rol;
+                setRolLabels(btn.dataset.rol, true);
+            });
+        });
+
+        // Registro tabs
+        document.querySelectorAll("#form-registro .role-tabs button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#form-registro .role-tabs button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                document.getElementById("rol-input-reg").value = btn.dataset.rol;
+                document.getElementById("extra-docente").style.display = btn.dataset.rol === "docente" ? "block" : "none";
+                document.getElementById("campos-estudiante").style.display = btn.dataset.rol === "estudiante" ? "block" : "none";
+                setRolLabels(btn.dataset.rol, false);
+                const rn = document.getElementById("reg-nie");
+                if (rn) {
+                  if (btn.dataset.rol === "estudiante") {
+                    rn.pattern = "[0-9]{4,20}";
+                    rn.title = "Solo números, 4 a 20 dígitos";
+                  } else {
+                    rn.pattern = "[A-Za-z0-9\\-]{4,20}";
+                    rn.title = "Letras, números y guiones";
+                  }
+                }
+            });
+        });
+
+        document.getElementById("show-registro").addEventListener("click", e => {
+            e.preventDefault();
+            document.getElementById("form-login").style.display = "none";
+            document.getElementById("form-registro").style.display = "block";
+            document.getElementById("texto-login").style.display = "none";
+            document.getElementById("texto-reg").style.display = "inline";
+        });
+        document.getElementById("show-login").addEventListener("click", e => {
+            e.preventDefault();
+            document.getElementById("form-registro").style.display = "none";
+            document.getElementById("form-login").style.display = "block";
+            document.getElementById("texto-reg").style.display = "none";
+            document.getElementById("texto-login").style.display = "inline";
+        });
+    </script>
+</body>
+</html>

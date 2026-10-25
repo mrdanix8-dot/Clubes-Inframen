@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Portal de Clubes INFRAMEN{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/escorpion.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% if session.get('user_id') %}
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="{{ url_for('catalogo') }}" class="logo">
+                <img src="{{ url_for('static', filename='img/escorpion.png') }}" alt="INFRAMEN" style="width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 0 2px rgba(225,29,72,0.5));">
+                <span>Clubes INFRAMEN</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="{{ url_for('catalogo') }}" class="{% if request.endpoint == 'catalogo' %}active{% endif %}">Catálogo</a>
+                <a href="{{ url_for('agenda') }}" class="{% if request.endpoint == 'agenda' %}active{% endif %}">Agenda y Eventos</a>
+                {% if session.get('rol') == 'docente' %}
+                <a href="{{ url_for('gestion') }}" class="{% if request.endpoint == 'gestion' %}active{% endif %}">Gestión Docente</a>
+                {% endif %}
+                <a href="{{ url_for('mi_club') }}" class="{% if request.endpoint == 'mi_club' %}active{% endif %}">Mi Perfil</a>
+            </div>
+
+            <div class="user-area">
+                <button class="btn-icon" id="theme-toggle" title="Cambiar tema">🌙</button>
+                <div class="user-chip">
+                    {% if session.get('foto') %}
+                    <img src="{{ url_for('uploaded_file', filename=session.foto) }}" alt="Foto" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+                    {% else %}
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e11d48,#f472b6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">
+                        {{ session.nombre[0] if session.nombre else '?' }}
+                    </div>
+                    {% endif %}
+                    <div>
+                        <div style="font-weight:600;font-size:0.85rem;">{{ session.nombre[:18] }}{% if session.nombre|length > 18 %}…{% endif %}</div>
+                        <div style="font-size:0.7rem;color:var(--text-secondary);">
+                            {% if session.rol == 'docente' %}{{ session.cargo or 'Docente' }}{% else %}Estudiante{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline">Cerrar sesión</a>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="alerts">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

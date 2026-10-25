@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ club.nombre }} · Clubes INFRAMEN{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="club-hero fade-up">
+        <div class="club-hero-img">
+            {% if club.foto == 'banda.jpg' %}
+            <img src="{{ url_for('static', filename='img/banda.jpg') }}" alt="{{ club.nombre }}" class="img-animate">
+            {% elif club.foto == 'futsal' %}
+            <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&h=500&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+            {% elif club.foto == 'futbol11' %}
+            <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&h=500&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+            {% elif club.foto == 'voleibol' %}
+            <img src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&h=500&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+            {% elif club.foto == 'cachiporras.jpg' or club.foto == 'cachiporras' %}
+            <img src="{{ url_for('static', filename='img/cachiporras.jpg') }}" alt="{{ club.nombre }}" class="img-animate">
+            {% elif club.foto == 'muralismo' %}
+            <img src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&h=500&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+            {% elif club.foto == 'cruzroja' %}
+            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=500&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+            {% elif club.foto == 'danza' %}
+            <img src="https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=800&h=500&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+            {% elif club.foto %}
+            <img src="{{ url_for('uploaded_file', filename=club.foto) }}" alt="{{ club.nombre }}" class="img-animate">
+            {% else %}
+            <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba6851?w=800&h=500&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+            {% endif %}
+        </div>
+
+        <div class="club-info">
+            <span class="badge-cat">{{ club.categoria }}</span>
+            <h1>{{ club.nombre }}</h1>
+            <p style="color:var(--text-secondary);margin-bottom:1rem;">{{ club.descripcion }}</p>
+
+            <ul class="info-list">
+                <li><strong>Horario</strong> {{ club.horario or 'Por definir' }}</li>
+                <li><strong>Lugar</strong> {{ club.lugar or 'Por definir' }}</li>
+                <li><strong>Turno</strong> {{ club.turno or '—' }}</li>
+                <li><strong>Requisitos</strong> {{ club.requisitos or 'Ninguno especial' }}</li>
+                <li><strong>Docente</strong> {{ club.docente_nombre or 'Por asignar' }}</li>
+                <li><strong>Cupos</strong> {{ club.capacidad - club.inscritos }} disponibles de {{ club.capacidad }}</li>
+            </ul>
+
+            {% if session.rol == 'estudiante' %}
+                {% if inscrito %}
+                    <div class="btn btn-outline" style="pointer-events:none;opacity:0.8;">
+                        ✓ Ya estás inscrito ({{ inscrito.estado }})
+                    </div>
+                {% else %}
+                    <form method="POST" action="{{ url_for('inscribir', club_id=club.id) }}">
+                        <button type="submit" class="btn btn-primary">
+                            Inscribirme Ahora →
+                        </button>
+                    </form>
+                    <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;">
+                        Se requiere promedio ≥ 7.0
+                    </p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Anuncios del club -->
+    <h2 class="section-title">📢 Anuncios del Club</h2>
+    {% if anuncios %}
+        {% for a in anuncios %}
+        <div class="anuncio {% if a.urgente %}urgente{% endif %} fade-up">
+            <h4>{{ a.titulo }}</h4>
+            <div class="meta">
+                {{ a.autor or 'Instructor' }} · {{ a.fecha[:16] if a.fecha else '' }}
+                {% if a.urgente %} · <span style="color:var(--warning);">URGENTE</span>{% endif %}
+            </div>
+            <p>{{ a.contenido }}</p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="color:var(--text-secondary);">No hay anuncios publicados todavía.</p>
+    {% endif %}
+</div>
+{% endblock %}

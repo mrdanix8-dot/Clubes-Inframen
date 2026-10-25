@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Catálogo de Clubes · INFRAMEN{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header fade-up">
+        <h1>Orden que une <span style="color:var(--accent);">Disciplina que Forma</span></h1>
+        <p>Ciclo Lectivo 2025 · La participación en clubes oficiales acredita tus horas de Servicio Social.</p>
+    </div>
+
+    <div class="filters fade-up delay-1">
+        <button class="filter-btn active" data-filter="todos">Todos los Clubes</button>
+        {% for cat in categorias %}
+        <button class="filter-btn" data-filter="{{ cat }}">{{ cat }}</button>
+        {% endfor %}
+    </div>
+
+    <div class="clubs-grid">
+        {% for club in clubes %}
+        <a href="{{ url_for('club_detalle', club_id=club.id) }}" class="card fade-up" data-categoria="{{ club.categoria }}" style="animation-delay: {{ loop.index0 * 0.08 }}s">
+            <div class="card-img">
+                {% if club.foto == 'banda.jpg' %}
+                <img src="{{ url_for('static', filename='img/banda.jpg') }}" alt="{{ club.nombre }}" class="img-animate">
+                {% elif club.foto == 'futsal' %}
+                <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600&h=400&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+                {% elif club.foto == 'futbol11' %}
+                <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600&h=400&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+                {% elif club.foto == 'voleibol' %}
+                <img src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=600&h=400&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+                {% elif club.foto == 'cachiporras.jpg' or club.foto == 'cachiporras' %}
+                <img src="{{ url_for('static', filename='img/cachiporras.jpg') }}" alt="{{ club.nombre }}" class="img-animate">
+                {% elif club.foto == 'muralismo' %}
+                <img src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=400&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+                {% elif club.foto == 'cruzroja' %}
+                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+                {% elif club.foto == 'danza' %}
+                <img src="https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=600&h=400&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+                {% elif club.foto %}
+                <img src="{{ url_for('uploaded_file', filename=club.foto) }}" alt="{{ club.nombre }}" class="img-animate">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba6851?w=600&h=400&fit=crop" alt="{{ club.nombre }}" class="img-animate">
+                {% endif %}
+                <span class="card-badge">{{ club.categoria }}</span>
+                <span class="card-cupos">{{ club.capacidad - club.inscritos }} Cupos</span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">{{ club.nombre }}</h3>
+                <p class="card-desc">{{ club.descripcion or 'Sin descripción disponible.' }}</p>
+                <div class="card-meta">
+                    {% if club.horario %}<span>🕒 {{ club.horario[:30] }}{% if club.horario|length > 30 %}…{% endif %}</span>{% endif %}
+                    {% if club.turno %}<span>{{ club.turno }}</span>{% endif %}
+                    {% if club.docente_nombre %}<span>👤 {{ club.docente_nombre }}</span>{% endif %}
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <p style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:3rem;">
+            No hay clubes disponibles por el momento.
+        </p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

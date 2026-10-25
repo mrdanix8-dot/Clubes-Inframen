@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Agenda y Eventos Cívicos · INFRAMEN{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header fade-up">
+        <p style="color:var(--accent);font-size:0.85rem;letter-spacing:1px;margin-bottom:0.3rem;">CICLO LECTIVO Y CÍVICO 2025</p>
+        <h1>Agenda Cívica y Eventos<br><span style="color:var(--accent);">que trascienden</span></h1>
+        <p>Programación oficial y eventos generados por los clubes del Instituto Nacional General Francisco Menéndez.</p>
+    </div>
+
+    {% if eventos %}
+    <h2 class="section-title">📅 Eventos de los clubes</h2>
+    <div class="clubs-grid" style="margin-bottom:2.5rem;">
+        {% for e in eventos %}
+        <div class="card fade-up">
+            <div class="card-body">
+                <span class="badge badge-info" style="margin-bottom:0.5rem;">{{ e.club_nombre or 'Club' }}</span>
+                {% if e.categoria %}<span class="badge" style="margin-bottom:0.5rem;">{{ e.categoria }}</span>{% endif %}
+                <h3 class="card-title">{{ e.titulo }}</h3>
+                <p class="card-desc">{{ e.descripcion or '' }}</p>
+                <div class="card-meta">
+                    {% if e.fecha %}<span>📅 {{ e.fecha }}</span>{% endif %}
+                    {% if e.hora %}<span>🕒 {{ e.hora }}</span>{% endif %}
+                    {% if e.lugar %}<span>📍 {{ e.lugar }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:var(--text-secondary);margin-bottom:2rem;">
+        Aún no hay eventos creados por los docentes. Cuando un maestro publique un evento desde Gestión Docente, aparecerá aquí.
+    </p>
+    {% endif %}
+
+    <h2 class="section-title">🏛️ Eventos institucionales</h2>
+    <div class="clubs-grid">
+        <div class="card fade-up">
+            <div class="card-img" style="height:160px;">
+                <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&h=400&fit=crop" alt="Gala" class="img-animate">
+                <span class="card-badge">Aniversario</span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Gran Presentación de Gala Cívica: 140 Aniversario</h3>
+                <p class="card-desc">Convocatoria de honor para toda la comunidad estudiantil. Presentación conjunta de Banda de Paz, Cachiporras y Danza Folklórica.</p>
+                <div class="card-meta">
+                    <span>📅 15 Mar 2025</span>
+                    <span>🕒 4:30 PM</span>
+                    <span>📍 Teatro Presidente</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card fade-up delay-1">
+            <div class="card-img" style="height:160px;">
+                <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600&h=400&fit=crop" alt="Fútbol" class="img-animate">
+                <span class="card-badge">Deporte</span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Clásico Intercolegial de Fútbol 11</h3>
+                <p class="card-desc">INFRAMEN vs Instituto Técnico Ricaldone. Gran final del Torneo Apertura CODICADER departamental.</p>
+                <div class="card-meta">
+                    <span>📅 22 Feb 2025</span>
+                    <span>🕒 3:00 PM</span>
+                    <span>📍 Estadio Flor Blanca</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card fade-up delay-2">
+            <div class="card-img" style="height:160px;">
+                <img src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=400&fit=crop" alt="Arte" class="img-animate">
+                <span class="card-badge">Artes</span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Exposición de Murales y Artes Visuales</h3>
+                <p class="card-desc">Muestra anual de pintura al óleo, grabado y escultura inspirada en la historia del General Francisco Menéndez.</p>
+                <div class="card-meta">
+                    <span>📅 05 Mar 2025</span>
+                    <span>🕒 8:30 AM – 4:00 PM</span>
+                    <span>📍 Galería Central</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card fade-up delay-3">
+            <div class="card-img" style="height:160px;">
+                <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&h=400&fit=crop" alt="Ecología" class="img-animate">
+                <span class="card-badge">Ecología</span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Jornada de Reforestación y Conciencia Ecológica</h3>
+                <p class="card-desc">Voluntariado estudiantil. Siembra de especies nativas. Horas sociales válidas: 8 horas.</p>
+                <div class="card-meta">
+                    <span>📅 08 Mar 2025</span>
+                    <span>🕒 7:00 AM – 1:00 PM</span>
+                    <span>📍 Parque Balboa</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

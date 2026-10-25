@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+{% block title %}Gestión Docente · INFRAMEN{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header fade-up">
+        <h1>Panel de Gestión Docente</h1>
+        <p>Administra tus clubes, anuncios, permisos y estudiantes.</p>
+    </div>
+
+    <div class="panel-grid">
+        <!-- COLUMNA IZQUIERDA -->
+        <div>
+            <!-- Crear Club -->
+            <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
+                <h2 class="section-title">➕ Crear nuevo club</h2>
+                <form method="POST" action="{{ url_for('crear_club') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Nombre del club *</label>
+                        <input type="text" name="nombre" class="form-control" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select name="categoria" class="form-control">
+                                <option>Deportes</option>
+                                <option>Arte y Tradición</option>
+                                <option>Música y Banda</option>
+                                <option>Voluntariado y Liderazgo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Turno</label>
+                            <select name="turno" class="form-control">
+                                <option>Matutino</option>
+                                <option>Vespertino</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea name="descripcion" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Horario</label>
+                        <input type="text" name="horario" class="form-control" placeholder="Ej: Martes y Jueves 2:00-4:00 PM">
+                    </div>
+                    <div class="form-group">
+                        <label>Lugar</label>
+                        <input type="text" name="lugar" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Requisitos</label>
+                        <input type="text" name="requisitos" class="form-control" placeholder="Promedio ≥ 7.0 · ...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Capacidad</label>
+                            <input type="number" name="capacidad" class="form-control" value="20" min="5" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Foto del club</label>
+                            <input type="file" name="foto" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Crear Club</button>
+                </form>
+            </div>
+
+            <!-- Publicar Anuncio -->
+            <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
+                <h2 class="section-title">📢 Publicar anuncio</h2>
+                <form method="POST" action="{{ url_for('publicar_anuncio') }}">
+                    <div class="form-group">
+                        <label>Club</label>
+                        <select name="club_id" class="form-control" required>
+                            {% for c in mis_clubes %}
+                            <option value="{{ c.id }}">{{ c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" name="titulo" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contenido</label>
+                        <textarea name="contenido" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;font-size:0.9rem;">
+                        <input type="checkbox" name="urgente" value="1"> Marcar como urgente
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-block">Publicar y notificar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA -->
+        <div>
+            <!-- Enviar notificación -->
+            <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
+                <h2 class="section-title">🔔 Enviar notificación</h2>
+                <form method="POST" action="{{ url_for('enviar_notificacion') }}">
+                    <div class="form-group">
+                        <label>Destinatarios (club)</label>
+                        <select name="club_id" class="form-control">
+                            <option value="">Todos los estudiantes</option>
+                            {% for c in mis_clubes %}
+                            <option value="{{ c.id }}">{{ c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" name="titulo" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mensaje</label>
+                        <textarea name="mensaje" class="form-control" rows="2" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Enviar</button>
+                </form>
+            </div>
+
+            <!-- Subir permiso PDF oficial -->
+            <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
+                <h2 class="section-title">📄 Subir permiso PDF oficial</h2>
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">
+                    Para eventos o ensayos en hora de clase: sube el permiso para que los alumnos lo descarguen e impriman.
+                </p>
+                <form method="POST" action="{{ url_for('subir_pdf_permiso') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Club (obligatorio)</label>
+                        <select name="club_id" class="form-control" required>
+                            {% for c in mis_clubes %}
+                            <option value="{{ c.id }}">{{ c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Motivo / título del permiso</label>
+                        <input type="text" name="motivo" class="form-control" placeholder="Ej: Ensayo general pre-festival · justificación de clases" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha inicio</label>
+                            <input type="date" name="fecha_inicio" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha fin</label>
+                            <input type="date" name="fecha_fin" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Archivo PDF *</label>
+                        <input type="file" name="pdf" class="form-control" accept=".pdf,application/pdf" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Subir permiso y notificar alumnos</button>
+                </form>
+            </div>
+
+
+            <!-- Crear evento del club -->
+            <div class="card" style="padding:1.5rem;margin-bottom:1.5rem;">
+                <h2 class="section-title">📅 Crear evento de mi club</h2>
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">
+                    Genera eventos (ensayos, presentaciones, partidos) vinculados a tu club. Los inscritos reciben notificación.
+                </p>
+                <form method="POST" action="{{ url_for('crear_evento') }}">
+                    <div class="form-group">
+                        <label>Club</label>
+                        <select name="club_id" class="form-control" required>
+                            {% for c in mis_clubes %}
+                            <option value="{{ c.id }}">{{ c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Título del evento *</label>
+                        <input type="text" name="titulo" class="form-control" required placeholder="Ej: Ensayo general · Partido amistoso">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea name="descripcion" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" name="fecha" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Hora</label>
+                            <input type="text" name="hora" class="form-control" placeholder="Ej: 2:00 PM - 5:00 PM">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Lugar</label>
+                        <input type="text" name="lugar" class="form-control" placeholder="Ej: Plaza Cívica INFRAMEN">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Crear evento y notificar</button>
+                </form>
+            </div>
+
+            <!-- Mis clubes -->
+            <div class="card" style="padding:1.5rem;">
+                <h2 class="section-title">🏅 Mis clubes</h2>
+                {% for c in mis_clubes %}
+                <div style="border-bottom:1px solid var(--border);padding:0.8rem 0;">
+                    <strong>{{ c.nombre }}</strong>
+                    <div style="font-size:0.85rem;color:var(--text-secondary);">
+                        {{ c.inscritos }}/{{ c.capacidad }} inscritos · {{ c.turno }}
+                    </div>
+                    <form method="POST" action="{{ url_for('editar_horario', club_id=c.id) }}" style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <input type="text" name="horario" class="form-control" style="flex:1;min-width:140px;" value="{{ c.horario or '' }}" placeholder="Nuevo horario">
+                        <input type="text" name="lugar" class="form-control" style="flex:1;min-width:120px;" value="{{ c.lugar or '' }}" placeholder="Lugar">
+                        <button type="submit" class="btn btn-sm btn-outline">Guardar</button>
+                    </form>
+                </div>
+                {% else %}
+                <p style="color:var(--text-secondary);">Aún no tienes clubes asignados. Crea uno arriba.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de estudiantes -->
+    <h2 class="section-title" style="margin-top:2.5rem;">👨‍🎓 Estudiantes inscritos y control académico</h2>
+    <p style="color:var(--text-secondary);margin-bottom:1rem;font-size:0.9rem;">
+        Validación de promedio académico mínimo (≥ 7.0) para permanencia activa en selecciones.
+    </p>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Estudiante</th>
+                    <th>NIE / Año</th>
+                    <th>Club</th>
+                    <th>Promedio</th>
+                    <th>Boleta PDF</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in estudiantes %}
+                <tr>
+                    <td>
+                        <strong>{{ e.nombre }}</strong>
+                    </td>
+                    <td>
+                        {{ e.nie }}<br>
+                        <small style="color:var(--text-secondary);">{{ e.seccion or '' }} {{ e.bachillerato or '' }}</small>
+                    </td>
+                    <td>{{ e.club_nombre or '—' }}</td>
+                    <td>
+                        {% if e.promedio is not none %}
+                            <span class="{% if e.promedio >= 7 %}badge badge-success{% else %}badge badge-danger{% endif %}">
+                                {{ "%.1f"|format(e.promedio) }}
+                            </span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if e.boleta_pdf %}
+                        <a href="{{ url_for('uploaded_file', filename=e.boleta_pdf) }}" target="_blank" class="btn btn-sm btn-outline">Ver boleta</a>
+                        {% else %}
+                        <span style="color:var(--text-secondary);font-size:0.8rem;">Sin boleta</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if e.estado %}
+                        <span class="badge badge-info">{{ e.estado }}</span>
+                        {% else %}
+                        <span class="badge">Sin club</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" style="text-align:center;color:var(--text-secondary);">No hay estudiantes registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Permisos recientes -->
+    <h2 class="section-title" style="margin-top:2.5rem;">📄 Permisos recientes</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Estudiante</th>
+                    <th>Club</th>
+                    <th>Motivo</th>
+                    <th>Fechas</th>
+                    <th>Estado</th>
+                    <th>PDF</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in permisos %}
+                <tr>
+                    <td>{{ p.estudiante_nombre }}</td>
+                    <td>{{ p.club_nombre or '—' }}</td>
+                    <td>{{ p.motivo[:40] }}{% if p.motivo and p.motivo|length > 40 %}…{% endif %}</td>
+                    <td>{{ p.fecha_inicio or '' }} → {{ p.fecha_fin or '' }}</td>
+                    <td>
+                        <span class="badge {% if p.estado == 'aprobado' %}badge-success{% elif p.estado == 'pendiente' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ p.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if p.archivo_pdf %}
+                        <a href="{{ url_for('uploaded_file', filename=p.archivo_pdf) }}" target="_blank" class="btn btn-sm btn-outline">Descargar</a>
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" style="text-align:center;color:var(--text-secondary);">No hay permisos registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
